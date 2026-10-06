@@ -1,0 +1,106 @@
+version: 1
+experiment_name: top100_core10_rolling_robustness
+data_config: configs/data_us_equity_ml.yaml
+
+universe: top100
+feature_set: core10
+risk_model: diagonal
+methods:
+  - return_ml_rank
+  - markowitz_ml
+  - static_ml
+  - static_ml_star
+  - portfolio_ml_linear
+  - portfolio_ml_rf
+unstable_diagnostic_methods: [markowitz_ml]
+
+protocol: rolling_yearly
+fast_split:
+  train_start: "1995-01-31"
+  train_end: "2014-12-31"
+  validation_start: "2015-01-31"
+  validation_end: "2017-12-31"
+  test_start: "2018-01-31"
+  test_end: "2024-12-31"
+
+rolling_yearly:
+  first_test_year: 2005
+  last_test_year: 2024
+  analysis_start: "1995-01-31"
+  validation_years: 3
+
+gamma_grid: [5, 10, 20]
+baseline_gamma: 10
+aum_grid: [100000000, 1000000000]
+baseline_aum: 1000000000
+random_seed: 20260710
+
+return_ml:
+  models: [ridge, rf_ridge]
+  lambda_grid: [0.01, 0.1, 1, 10, 100, 1000]
+  rf_p_grid: [32, 64]
+  rf_eta_grid: [0.1, 0.5]
+  rank_gross_leverage: 1.0
+
+markowitz_ml:
+  covariance_ridge: 1.0e-8
+  eigenvalue_floor: 1.0e-8
+  max_leverage: null
+  warning_leverage: 20.0
+
+static_ml:
+  phi_grid: [1, 3, 6, 12]
+  mu_shrinkage_grid: [0.01, 0.05, 0.1, 0.25, 0.5, 1.0]
+  covariance_ridge: 1.0e-8
+
+static_ml_star:
+  u_grid: [0.05, 0.1, 0.25, 0.5, 1.0]
+  v_grid: [0, 0.25, 0.5, 1.0]
+  k_grid: [0.5, 1.0, 2.0]
+  covariance_adjustment: cov_add
+  covariance_ridge: 1.0e-8
+
+portfolio_ml:
+  lambda_grid: [0.1, 1, 10, 100, 1000, 10000]
+  rf_p_grid: [32, 64]
+  rf_eta_grid: [0.1, 0.5]
+  use_matrix_m: true
+  matrix_m_iterations: 10
+  expected_market_return: 0.007
+  risk_free_rate: 0.0
+  allow_scalar_rho_fallback: true
+  rho_grid_if_fallback: [0.25, 0.5, 0.75]
+  volatility_floor: 0.01
+  coefficient_ridge_floor: 1.0e-10
+  add_constant: true
+
+risk:
+  diagonal_source: vol_12m
+  variance_floor: 1.0e-6
+  factor_daily_to_monthly: 21.0
+  allow_factor_fallback: true
+
+diagnostic_risk_scaling:
+  enabled: false
+  target_annual_volatility: 0.10
+  methods: [markowitz_ml, static_ml, portfolio_ml_linear, portfolio_ml_rf]
+
+robustness:
+  newey_west_lags: 6
+  bootstrap_block_months: 12
+  bootstrap_replications: 2000
+
+accounting:
+  charge_exit_costs: true
+  missing_exit_return: 0.0
+  wealth_growth_floor: 0.1
+
+diagnostics:
+  max_abs_weight_warning: 5.0
+  max_leverage_warning: 20.0
+  covariance_condition_warning: 1.0e10
+
+outputs:
+  experiments_dir: results/experiments
+  reports_dir: reports/model_results
+  save_plots: false

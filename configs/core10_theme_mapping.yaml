@@ -1,0 +1,22 @@
+version: 1
+scope: explanatory_only
+feature_set: core10
+feature_set_search_closed: true
+themes:
+  Momentum:
+    - momentum_12_1
+  Reversal:
+    - reversal_1m
+  Risk / Low volatility:
+    - volatility_12m
+    - beta_mkt
+    - idio_vol
+  Liquidity / Size:
+    - log_mcap
+    - adv_6m
+  Value:
+    - book_to_market
+  Quality / Profitability:
+    - gross_profitability
+  Investment / Accruals:
+    - asset_growth

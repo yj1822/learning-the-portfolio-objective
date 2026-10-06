@@ -1,0 +1,130 @@
+version: 1
+dataset_name: us_equity_ml
+
+start_date: "1990-01-01"
+end_date: "2024-12-31"
+analysis_start: "1995-01-31"
+oos_start: "2005-01-31"
+
+max_universe_n: 500
+universe_variants: [top100, top300, top500]
+min_price: 5.0
+rank_features: true
+missing_feature_value: 0.5
+baseline_aum: 1000000000
+
+transaction_cost:
+  model: adv_quadratic
+  lambda_multiplier: 0.2
+  adv_window_months: 6
+
+# These are data-period labels only. Model code may change the split dates by
+# editing this config; the processed panel itself is not rebuilt.
+sample_periods:
+  train:
+    start: "1995-01-31"
+    end: "1999-12-31"
+  validation:
+    start: "2000-01-31"
+    end: "2004-12-31"
+  test:
+    start: "2005-01-31"
+    end: "2024-12-31"
+
+feature_sets:
+  core10:
+    - momentum_12_1
+    - reversal_1m
+    - volatility_12m
+    - beta_mkt
+    - idio_vol
+    - log_mcap
+    - adv_6m
+    - book_to_market
+    - gross_profitability
+    - asset_growth
+  final15:
+    - momentum_12_1
+    - momentum_6_1
+    - momentum_3_1
+    - reversal_1m
+    - volatility_12m
+    - beta_mkt
+    - idio_vol
+    - log_mcap
+    - adv_6m
+    - amihud_illiq
+    - book_to_market
+    - earnings_to_price
+    - gross_profitability
+    - operating_profitability
+    - asset_growth
+  final20_conservative:
+    - momentum_12_1
+    - reversal_1m
+    - volatility_12m
+    - beta_mkt
+    - idio_vol
+    - log_mcap
+    - adv_6m
+    - book_to_market
+    - gross_profitability
+    - asset_growth
+    - qmj_safety
+    - operating_cashflow_yield
+    - debt_to_book
+    - operating_accruals
+    - sales_to_market
+    - qmj_profitability
+    - market_beta_252d
+    - dollar_volume_variability
+    - momentum_18_1
+    - ebit_to_market
+
+# Canonical thesis feature -> candidate JKP fields, in priority order.
+# Confirm these aliases against factor_details.xlsx for the licensed release.
+feature_aliases:
+  momentum_12_1: [momentum_12_1, ret_12_1, mom12m]
+  momentum_6_1: [momentum_6_1, ret_6_1, mom6m]
+  momentum_3_1: [momentum_3_1, ret_3_1, mom3m]
+  reversal_1m: [reversal_1m, ret_1_0, short_term_reversal]
+  volatility_12m: [rvol_252d, volatility_12m, vol_12m]
+  beta_mkt: [beta_60m, beta_252d, beta_mkt, beta]
+  idio_vol: [ivol_capm_60m, ivol_capm_252d, ivol_ff3_21d, idio_vol, idiosyncratic_volatility, ivol]
+  log_mcap: [log_mcap, logme, ln_me]
+  adv_6m: [adv_6m, average_dollar_volume_6m]
+  amihud_illiq: [ami_126d, amihud_illiq, amihud, illiquidity]
+  book_to_market: [be_me, book_to_market, bm]
+  earnings_to_price: [ni_me, earnings_to_price, ep]
+  gross_profitability: [gp_at, gross_profitability, gp]
+  operating_profitability: [op_at, operating_profitability, ope_be, roe]
+  asset_growth: [at_gr1, asset_growth, asset_growth_1y]
+  qmj_safety: [qmj_safety]
+  operating_cashflow_yield: [ocf_me]
+  debt_to_book: [debt_be]
+  operating_accruals: [oaccruals_at]
+  sales_to_market: [sale_me]
+  qmj_profitability: [qmj_prof]
+  market_beta_252d: [beta_252d]
+  dollar_volume_variability: [dolvol_var_126d]
+  momentum_18_1: [ret_18_1]
+  ebit_to_market: [ebit_me]
+
+data_hub:
+  project_root_env: TRADING_DATA_HUB_ROOT
+  config_env: DATAHUB_CONFIG
+  country: USA
+  build_master_if_missing: true
+  build_risk_if_missing: true
+  risk_ewma_span: 60
+
+outputs:
+  processed_dir: data/processed/us_equity_ml
+  samples_dir: data/samples
+  validation_dir: reports/data_validation
+
+validation:
+  top500_min_count: 450
+  monthly_count_jump_fraction: 0.20
+  lambda_extreme_ratio: 10000
+  label_missing_warning_rate: 0.20

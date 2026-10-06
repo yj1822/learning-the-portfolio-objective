@@ -1,0 +1,53 @@
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+.local/
+*.pem
+*.key
+
+# Python and build products
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytest_tmp/
+.pytest_*/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Licensed inputs and generated research artifacts
+data/*
+!data/README.md
+data/raw/
+data/processed/
+data/private/
+data/samples/
+results/*
+results/checkpoints/
+results/cache/
+results/tmp/
+figures/*
+!figures/published/
+figures/published/*
+!figures/published/*.png
+reports/
+outputs/
+deliverables/
+.artifact_tool_*/
+notebooks/.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local reference checkouts and temporary work
+third_party/
+tmp/
+work/
